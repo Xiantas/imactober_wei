@@ -4,20 +4,14 @@ use bevy::{
     prelude::{
         Assets,
         Camera2dBundle,
-        Color,
-        ColorMaterial,
+        Color, ColorMaterial,
         Commands,
         default,
-        Input,
-        KeyCode,
+        Input, KeyCode,
         Mesh,
-        Query,
-        Res,
-        ResMut,
+        Query, With, Res, ResMut,
         shape,
-        Transform,
-        Vec3,
-        With,
+        Transform, Vec3,
     },
     sprite::MaterialMesh2dBundle,
 };
@@ -27,22 +21,40 @@ pub fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle {
+        transform: Transform::from_xyz(200., 150., 0.),
+        ..default()
+    });
     commands.spawn(PlayerBundle {
         material_bundle: MaterialMesh2dBundle {
             mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
-            transform: Transform::from_xyz(100., 100., 0.).with_scale(Vec3::splat(128.)),
+            transform: Transform::from_xyz(0., 0., 0.).with_scale(Vec3::splat(128.)),
             material: materials.add(ColorMaterial::from(Color::PURPLE)),
             ..default()
         },
-        ..default()
+        player: Player {
+            gravity: Vec3::new(0., -0.6, 0.),
+            velocity: Vec3::ZERO,
+            jumping: false,
+        },
     });
 }
 
-/// The sprite is animated by changing its translation depending on the time that has passed since
-/// the last frame.
-pub fn player_update(mut sprite_position: Query<&mut Transform, With<Player>>) {
-    for mut transform in &mut sprite_position {
+pub fn player_update(mut players: Query<(&mut Player, &mut Transform)>) {
+    for (mut player, mut transform) in &mut players {
+        if player.jumping {
+            if transform.translation.y <= 0. {
+                player.velocity.y = 20.;
+            }
+            player.jumping = false;
+        }
+
+        transform.translation += player.velocity;
+        if transform.translation.y < 0. {
+            transform.translation.y = 0.;
+        }
+        let grav = player.gravity;
+        player.velocity += grav;
     }
 }
 
