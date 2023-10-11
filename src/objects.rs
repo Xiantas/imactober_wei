@@ -13,6 +13,9 @@ use bevy::{
 #[derive(Component, Default)]
 pub struct Player {
     pub jumping: bool,
+    pub building_up: bool,
+    pub build_up_frames: f32,
+
     pub velocity: Vec3,
     pub gravity: Vec3,
 }

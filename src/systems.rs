@@ -33,21 +33,27 @@ pub fn setup(
             ..default()
         },
         player: Player {
-            gravity: Vec3::new(0., -0.6, 0.),
+            gravity: Vec3::new(0., -1.0, 0.),
             velocity: Vec3::ZERO,
             jumping: false,
+            ..default()
         },
     });
 }
 
 pub fn player_update(mut players: Query<(&mut Player, &mut Transform)>) {
     for (mut player, mut transform) in &mut players {
-        if player.jumping {
-            if transform.translation.y <= 0. {
-                player.velocity.y = 20.;
+        if transform.translation.y <= 0. {
+            if player.building_up {
+                player.build_up_frames += 1.;
             }
-            player.jumping = false;
+            if player.jumping {
+                player.velocity.y = player.build_up_frames;
+                player.build_up_frames = 10.;
+            }
         }
+        player.building_up = false;
+        player.jumping = false;
 
         transform.translation += player.velocity;
         if transform.translation.y < 0. {
@@ -62,9 +68,10 @@ pub fn handle_inputs(
     keyboard: Res<Input<KeyCode>>,
     mut players: Query<&mut Player>,
 ) {
-    if keyboard.just_pressed(KeyCode::Space) {
-        players.for_each_mut(|mut player| {
-            player.jumping = true;
-        });
-    }
+    let holding = keyboard.pressed(KeyCode::Space);
+    let release = keyboard.just_released(KeyCode::Space);
+    players.for_each_mut(|mut player| {
+        player.building_up |= holding;
+        player.jumping |= release;
+    });
 }

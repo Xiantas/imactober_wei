@@ -3,7 +3,11 @@ mod systems;
 
 use crate::systems::{player_update, setup, handle_inputs};
 
-use bevy::prelude::*;
+use bevy::prelude::{
+    DefaultPlugins,
+    App,
+    Startup, FixedUpdate, Update,
+};
 
 fn main() {
     App::new()
