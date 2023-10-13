@@ -22,13 +22,20 @@ pub fn setup(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands.spawn(Camera2dBundle {
-        transform: Transform::from_xyz(200., 150., 0.),
+        transform: Transform::from_xyz(0., 0., 0.),
+        projection: bevy::prelude::OrthographicProjection {
+            scaling_mode: bevy::render::camera::ScalingMode::Fixed{
+                width: 0.01,
+                height: 0.01,
+            },
+            ..default()
+        },
         ..default()
     });
     commands.spawn(PlayerBundle {
         material_bundle: MaterialMesh2dBundle {
             mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
-            transform: Transform::from_xyz(0., 0., 0.).with_scale(Vec3::splat(128.)),
+            transform: Transform::from_xyz(0., 0., 0.).with_scale(Vec3::splat(200.)),
             material: materials.add(ColorMaterial::from(Color::PURPLE)),
             ..default()
         },
