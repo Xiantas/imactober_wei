@@ -1,7 +1,12 @@
 mod objects;
 mod systems;
 
-use crate::systems::{player_update, setup, handle_inputs};
+use crate::systems::{
+    player_update,
+    setup,
+    handle_inputs,
+    draw_gizmos,
+};
 
 use bevy::prelude::{
     DefaultPlugins,
@@ -15,5 +20,6 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(FixedUpdate, player_update)
         .add_systems(Update, handle_inputs)
+        .add_systems(Update, draw_gizmos)
         .run();
 }
